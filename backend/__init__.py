@@ -1,2 +1,2 @@
 # backend/__init__.py
-# This makes the backend directory a Python package
+# empty - just makes this a Python package
