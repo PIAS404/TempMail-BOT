@@ -1,2 +1,2 @@
 # bot/__init__.py
-# This makes the bot directory a Python package
+# empty - just makes this a Python package
