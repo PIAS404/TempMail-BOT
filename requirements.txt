@@ -1,0 +1,7 @@
+fastapi
+uvicorn python-dotenv
+supabase
+aiogram==3.13.0
+pydantic
+python-multipart
+httpx
