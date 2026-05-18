@@ -38,6 +38,17 @@ async def get_email_by_address(email_address: str):
     response = supabase.table("user_emails").select("*").eq("email_address", email_address.lower()).execute()
     return response.data[0] if response.data else None
 
+async def delete_user_email(email_id: int) -> bool:
+    try:
+        # আগে এই ইমেইলের সব incoming mail ডিলিট করো
+        supabase.table("emails").delete().eq("user_email_id", email_id).execute()
+        # তারপর ইমেইল নিজে ডিলিট করো
+        supabase.table("user_emails").delete().eq("id", email_id).execute()
+        return True
+    except Exception as e:
+        print(f"Delete Error: {e}")
+        return False
+
 # ==================== INCOMING EMAIL ====================
 
 async def save_incoming_email(user_email_id: int, payload: dict):
