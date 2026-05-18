@@ -6,8 +6,8 @@ def main_menu():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="📧 Random Email"), KeyboardButton(text="✍️ Custom Email")],
-            [KeyboardButton(text="📬 My Emails"), KeyboardButton(text="📥 Inbox")],
-            [KeyboardButton(text="⭐ Help")]
+            [KeyboardButton(text="📬 My Emails"), KeyboardButton(text="🗑 Delete Email")],
+            [KeyboardButton(text="📥 Inbox"), KeyboardButton(text="⭐ Help")]
         ],
         resize_keyboard=True
     )
