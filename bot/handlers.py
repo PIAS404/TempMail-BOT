@@ -50,8 +50,9 @@ async def ask_custom_email(message: Message, state: FSMContext):
     await state.set_state(EmailStates.waiting_for_prefix)
     await message.answer(
         "✍️ তোমার পছন্দের ইমেইল প্রিফিক্স লিখো:\n\n"
-        f"উদাহরণ: `rakib` → rakib@{DOMAIN}\n\n"
-        "শুধু প্রিফিক্স লিখো:",
+        f"উদাহরণ: `rakib` → rakib@{DOMAIN}\n"
+        f"অথবা পুরো লিখো: `rakib@{DOMAIN}`\n\n"
+        "লিখো:",
         reply_markup=cancel_keyboard()
     )
 
@@ -62,13 +63,29 @@ async def cancel_handler(message: Message, state: FSMContext):
 
 @router.message(EmailStates.waiting_for_prefix)
 async def process_custom_email(message: Message, state: FSMContext):
-    prefix = message.text.strip().lower()
+    text = message.text.strip().lower()
 
-    if not re.match(r'^[a-z0-9][a-z0-9._-]{0,28}[a-z0-9]$', prefix) or len(prefix) < 3:
+    # যদি পুরো ইমেইল লিখে (help@piasx.top) তাহলে prefix বের করো
+    if "@" in text:
+        prefix = text.split("@")[0]
+    else:
+        prefix = text
+
+    # Validate prefix
+    if len(prefix) < 1 or len(prefix) > 30:
+        await message.answer(
+            "❌ প্রিফিক্স ১ থেকে ৩০ অক্ষরের মধ্যে হতে হবে।\n"
+            "আবার চেষ্টা করো:",
+            reply_markup=cancel_keyboard()
+        )
+        return
+
+    if not re.match(r'^[a-z0-9][a-z0-9._-]*$', prefix):
         await message.answer(
             "❌ অবৈধ প্রিফিক্স!\n\n"
             "শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা, dot, hyphen ব্যবহার করো।\n"
-            "ন্যূনতম ৩ অক্ষর। আবার চেষ্টা করো:",
+            "প্রথম অক্ষর অবশ্যই letter বা number হতে হবে।\n"
+            "আবার চেষ্টা করো:",
             reply_markup=cancel_keyboard()
         )
         return
