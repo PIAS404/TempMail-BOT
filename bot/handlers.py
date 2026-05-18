@@ -3,22 +3,22 @@ from aiogram.types import Message
 from aiogram.filters import Command
 from bot.keyboards import main_menu, cancel_keyboard
 from backend.crud import get_or_create_user, create_user_email, get_user_emails
+from backend.config import DOMAIN
 import random
 import string
-from backend.config import settings  # পরে বানাবো
 
 router = Router()
 
-def generate_random_email(domain: str):
+def generate_random_email():
     rand_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-    return f"{rand_str}@{domain}"
+    return f"{rand_str}@{DOMAIN}"
 
 
 @router.message(Command("start"))
 async def start_handler(message: Message):
     await message.answer(
         "👋 **স্বাগতম TempMail BOT-এ!**\n\n"
-        "তোমার নিজস্ব ডোমেইনে লাইফটাইম ইমেইল ব্যবহার করো।\n"
+        f"তোমার ডোমেইন: `{DOMAIN}`\n\n"
         "নিচের মেনু থেকে অপশন বেছে নাও 👇",
         reply_markup=main_menu()
     )
@@ -26,14 +26,14 @@ async def start_handler(message: Message):
 
 @router.message(F.text == "📧 Random Email")
 async def random_email_handler(message: Message):
-    email = generate_random_email(settings.DOMAIN)
+    email = generate_random_email()
     
     await create_user_email(message.from_user.id, email)
     
     await message.answer(
         f"✅ **র‍্যান্ডম ইমেইল তৈরি হয়েছে!**\n\n"
         f"`{email}`\n\n"
-        "এই ঠিকানায় মেইল পাঠালে সাথে সাথে নোটিফিকেশন পাবে।",
+        "এই ঠিকানায় যেকোনো মেইল পাঠালে সাথে সাথে নোটিফিকেশন পাবে।",
         reply_markup=main_menu()
     )
 
@@ -42,8 +42,8 @@ async def random_email_handler(message: Message):
 async def ask_custom_email(message: Message):
     await message.answer(
         "✍️ তোমার পছন্দের ইমেইল প্রিফিক্স লিখো:\n\n"
-        "উদাহরণ: `rakib`, `business2025`, `john123` ইত্যাদি\n\n"
-        "শুধু প্রিফিক্স লিখো (স্পেস ছাড়া):",
+        "উদাহরণ: `rakib`, `business2025`, `john123`\n\n"
+        "শুধু প্রিফিক্স লিখো:",
         reply_markup=cancel_keyboard()
     )
 
@@ -70,11 +70,7 @@ async def my_emails_handler(message: Message):
 
 @router.message(F.text == "📥 Inbox")
 async def inbox_handler(message: Message):
-    await message.answer(
-        "📥 **Inbox ফিচার শীঘ্রই আসছে!**\n\n"
-        "এখনো ডেভেলপমেন্ট চলছে।",
-        reply_markup=main_menu()
-    )
+    await message.answer("📥 **Inbox শীঘ্রই আসছে...**", reply_markup=main_menu())
 
 
 @router.message(F.text == "⭐ Help")
@@ -83,8 +79,7 @@ async def help_handler(message: Message):
         "🛠 **সাহায্য**\n\n"
         "• Random Email → অটো জেনারেট\n"
         "• Custom Email → নিজে নাম দাও\n"
-        "• My Emails → তোমার সব ইমেইল দেখো\n"
-        "• Inbox → সব মেইল দেখো\n\n"
-        "কোনো সমস্যা হলে জানাও।",
+        "• My Emails → তোমার সব ইমেইল দেখো\n\n"
+        "সমস্যা হলে জানাও।",
         reply_markup=main_menu()
     )
