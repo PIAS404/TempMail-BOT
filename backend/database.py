@@ -1,7 +1,8 @@
-from supabase import create_client, Client
+# backend/database.py
+
+from supabase import create_client
 from backend.config import SUPABASE_URL, SUPABASE_KEY
 
-# Supabase Client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-print("✅ Supabase Connected Successfully!")
+print("✅ Supabase Connected!")
