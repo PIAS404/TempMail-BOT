@@ -1,21 +1,8 @@
 # backend/config.py
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-DOMAIN = os.getenv("DOMAIN")
-
-if not SUPABASE_URL:
-    raise ValueError("SUPABASE_URL not found in .env")
-if not SUPABASE_KEY:
-    raise ValueError("SUPABASE_KEY not found in .env")
-if not TELEGRAM_TOKEN:
-    raise ValueError("TELEGRAM_TOKEN not found in .env")
-if not DOMAIN:
-    raise ValueError("DOMAIN not found in .env")
+SUPABASE_URL = "https://vziagzcedlrfjxxjynvi.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6aWFnemNlZGxyZmp4eGp5bnZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTY1MTcsImV4cCI6MjA5NDY5MjUxN30.DHUbjjScWbIxvozh1EgbAs0mPPzxlB-ShKSyzMOEwUQ"
+TELEGRAM_TOKEN = "8280327644:AAFEwkpyicJ4sbNHsahhXbJn5FnyRNqp19s"
+DOMAIN = "piasx.top"
 
 print(f"✅ Config Loaded - Domain: {DOMAIN}")
