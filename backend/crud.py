@@ -1,3 +1,5 @@
+# backend/crud.py
+
 from backend.database import supabase
 from datetime import datetime
 from typing import List, Optional
@@ -52,19 +54,19 @@ async def save_incoming_email(user_email_id: int, payload: dict):
     result = supabase.table("emails").insert(email_data).execute()
     return result.data[0]
 
-# ★ নতুন ফাংশন — Inbox দেখানোর জন্য
+# ==================== INBOX ====================
+
 async def get_inbox_for_user(telegram_id: int) -> List[dict]:
     user = await get_or_create_user(telegram_id)
     user_emails = await get_user_emails(telegram_id)
-    
+
     if not user_emails:
         return []
-    
+
     all_inbox = []
     for ue in user_emails:
         response = supabase.table("emails").select("*").eq("user_email_id", ue["id"]).order("received_at", desc=True).execute()
         all_inbox.extend(response.data)
-    
-    # সময় অনুযায়ী sort
+
     all_inbox.sort(key=lambda x: x.get("received_at", ""), reverse=True)
     return all_inbox
