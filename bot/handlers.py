@@ -1,10 +1,12 @@
+# bot/handlers.py
+
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from bot.keyboards import main_menu, cancel_keyboard
-from backend.crud import get_or_create_user, create_user_email, get_user_emails, get_inbox_for_user
+from backend.crud import get_or_create_user, create_user_email, get_user_emails, get_inbox_for_user, get_email_by_address
 from backend.config import DOMAIN
 import re
 import random
@@ -23,8 +25,9 @@ def generate_random_email():
 @router.message(Command("start"))
 async def start_handler(message: Message, state: FSMContext):
     await state.clear()
+    await get_or_create_user(message.from_user.id)
     await message.answer(
-        "👋 **স্বাগতম TempMail BOT-এ!**\n\n"
+        f"👋 **স্বাগতম TempMail BOT-এ!**\n\n"
         f"তোমার ডোমেইন: `{DOMAIN}`\n\n"
         "নিচের মেনু থেকে অপশন বেছে নাও 👇",
         reply_markup=main_menu()
@@ -47,7 +50,7 @@ async def ask_custom_email(message: Message, state: FSMContext):
     await state.set_state(EmailStates.waiting_for_prefix)
     await message.answer(
         "✍️ তোমার পছন্দের ইমেইল প্রিফিক্স লিখো:\n\n"
-        "উদাহরণ: `rakib`, `business2025`, `john123`\n\n"
+        f"উদাহরণ: `rakib` → rakib@{DOMAIN}\n\n"
         "শুধু প্রিফিক্স লিখো:",
         reply_markup=cancel_keyboard()
     )
@@ -55,15 +58,13 @@ async def ask_custom_email(message: Message, state: FSMContext):
 @router.message(F.text == "🔙 Cancel")
 async def cancel_handler(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer("❌ কাস্টম ইমেইল বাতিল করা হয়েছে।", reply_markup=main_menu())
+    await message.answer("❌ বাতিল করা হয়েছে।", reply_markup=main_menu())
 
-# ★ এই handler আগে ছিলো না — Custom Email prefix handle করবে
 @router.message(EmailStates.waiting_for_prefix)
 async def process_custom_email(message: Message, state: FSMContext):
     prefix = message.text.strip().lower()
 
-    # Validate prefix
-    if not re.match(r'^[a-z0-9][a-z0-9._-]{1,28}[a-z0-9]$', prefix):
+    if not re.match(r'^[a-z0-9][a-z0-9._-]{0,28}[a-z0-9]$', prefix) or len(prefix) < 3:
         await message.answer(
             "❌ অবৈধ প্রিফিক্স!\n\n"
             "শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা, dot, hyphen ব্যবহার করো।\n"
@@ -74,8 +75,6 @@ async def process_custom_email(message: Message, state: FSMContext):
 
     email = f"{prefix}@{DOMAIN}"
 
-    # Check duplicate
-    from backend.crud import get_email_by_address
     existing = await get_email_by_address(email)
     if existing:
         await message.answer(
@@ -121,7 +120,7 @@ async def inbox_handler(message: Message, state: FSMContext):
         return
 
     text = "📥 **তোমার Inbox:**\n\n"
-    for mail in inbox[:10]:  # সর্বোচ্চ ১০টা দেখাবে
+    for mail in inbox[:10]:
         text += (
             f"━━━━━━━━━━━━━━━\n"
             f"📨 **From:** {mail.get('from_name', 'Unknown')} ({mail.get('from_email', '')})\n"
@@ -135,10 +134,10 @@ async def help_handler(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         "🛠 **সাহায্য**\n\n"
-        "• Random Email → অটো জেনারেট\n"
-        "• Custom Email → নিজে নাম দাও\n"
-        "• My Emails → তোমার সব ইমেইল দেখো\n"
-        "• Inbox → আসা মেইলগুলো দেখো\n\n"
+        "• 📧 Random Email → অটো জেনারেট\n"
+        "• ✍️ Custom Email → নিজে নাম দাও\n"
+        "• 📬 My Emails → তোমার সব ইমেইল দেখো\n"
+        "• 📥 Inbox → আসা মেইলগুলো দেখো\n\n"
         "সমস্যা হলে জানাও।",
         reply_markup=main_menu()
     )
