@@ -1,27 +1,21 @@
 from datetime import datetime
 from typing import Optional
+from pydantic import BaseModel
 
-# Supabase-এর জন্য টেবিল স্ট্রাকচার (Pydantic Models)
-
-class User:
-    """ইউজারের তথ্য"""
+class User(BaseModel):
     id: Optional[int] = None
     telegram_id: int
     created_at: Optional[datetime] = None
 
-
-class UserEmail:
-    """একজন ইউজারের একাধিক ইমেইল সাপোর্ট করার জন্য"""
+class UserEmail(BaseModel):
     id: Optional[int] = None
     user_id: int
     email_address: str
     created_at: Optional[datetime] = None
 
-
-class Email:
-    """যে মেইলগুলো আসবে সেগুলোর তথ্য"""
+class Email(BaseModel):
     id: Optional[int] = None
-    user_email_id: int          # কোন ইমেইল অ্যাড্রেসে এসেছে
+    user_email_id: int
     from_email: str
     from_name: Optional[str] = None
     subject: str
