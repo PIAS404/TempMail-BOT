@@ -1,18 +1,13 @@
+# bot/main.py
+
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
 from bot.handlers import router
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-if not TELEGRAM_TOKEN:
-    raise ValueError("TELEGRAM_TOKEN not found in .env file")
+TELEGRAM_TOKEN = "8280327644:AAFEwkpyicJ4sbNHsahhXbJn5FnyRNqp19s"
 
 bot = Bot(
     token=TELEGRAM_TOKEN,
